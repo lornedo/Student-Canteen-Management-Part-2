@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Canteen Management System</title>
+  <style>
+    /* style1: Global reset and base typography */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    /* style2: Page body background and layout padding */
+    body {
+      background-color: #f4f6f8;
+      color: #1f2937;
+      padding: 24px;
+    }
+
+    /* style3: Main header section and title styling */
+    .main-header {
+      margin-bottom: 20px;
+    }
+
+    .main-header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    /* style4: Two-column grid layout for Admin and Customer sections */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    /* style5: Responsive single-column layout for smaller screens */
+    @media (max-width: 960px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* style6: Section titles for Admin and Customer headers */
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      padding-bottom: 4px;
+      border-bottom: 2px solid;
+    }
+
+    .admin-title {
+      color: #2563eb;
+      border-color: #bfdbfe;
+    }
+
+    .customer-title {
+      color: #16a34a;
+      border-color: #bbf7d0;
+    }
+
+    /* style7: Card containers for grouping dashboard blocks */
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 18px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    /* style8: Card titles and descriptive subtitles */
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 12px;
+    }
+
+    .card-subtitle {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: -6px;
+      margin-bottom: 14px;
+    }
+
+    /* style9: Form groups, labels, input fields, and selects */
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #475569;
+      margin-bottom: 4px;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 5px;
+      font-size: 13px;
+      background: #ffffff;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #2563eb;
+    }
+
+    .split-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* style10: Primary, success, edit, delete, and quantity buttons */
+    .btn {
+      padding: 9px 14px;
+      border: none;
+      border-radius: 5px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      width: 100%;
+      background: #2563eb;
+      color: #ffffff;
+    }
+    .btn-primary:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-success {
+      width: 100%;
+      background: #16a34a;
+      color: #ffffff;
+    }
+    .btn-success:hover {
+      background: #15803d;
+    }
+    .btn-success:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+    }
+
+    .btn-sm {
+      padding: 4px 8px;
+      font-size: 11px;
+    }
+
+    .btn-edit {
+      background: #e2e8f0;
+      color: #1e293b;
+      margin-right: 4px;
+    }
+    .btn-edit:hover {
+      background: #cbd5e1;
+    }
+
+    .btn-delete {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    .btn-delete:hover {
+      background: #fca5a5;
+    }
+
+    .btn-qty {
+      background: #f1f5f9;
+      color: #0f172a;
+      border: 1px solid #cbd5e1;
+      border-radius: 3px;
+      padding: 2px 7px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .btn-qty:hover {
+      background: #e2e8f0;
+    }
+
+    .btn-add-item {
+      background: #2563eb;
+      color: #ffffff;
+      padding: 5px 10px;
+      font-size: 12px;
+      border-radius: 4px;
+    }
+    .btn-add-item:hover {
+      background: #1d4ed8;
+    }
+
+    /* style11: Responsive tables, headers, and data cells */
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      text-align: left;
+    }
+
+    th {
+      background: #f8fafc;
+      color: #475569;
+      font-weight: 600;
+      padding: 8px 10px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+
+    /* style12: Status badges for Good, Low Stock, Out of Stock, and Expired */
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-good { background: #dcfce7; color: #166534; }
+    .badge-low { background: #fef3c7; color: #92400e; }
+    .badge-out { background: #fee2e2; color: #991b1b; }
+    .badge-expired { background: #fee2e2; color: #991b1b; }
+
+    /* style13: Customer available menu list items and price styling */
+    .menu-item-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 290px;
+      overflow-y: auto;
+    }
+
+    .menu-item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 9px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      background: #f8fafc;
+    }
+
+    .menu-item-details {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .menu-item-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    .menu-item-sub {
+      font-size: 11px;
+      color: #64748b;
+    }
+
+    .menu-item-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .menu-item-price {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    /* style14: Order tray summary, totals, and empty state message */
+    .order-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 14px 0 12px 0;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .order-total-val {
+      font-size: 16px;
+      color: #16a34a;
+    }
+
+    .empty-note {
+      font-size: 12px;
+      color: #94a3b8;
+      font-style: italic;
+      padding: 8px 0;
+    }
+
+    /* style15: Plain alert boxes for low stock and expiry warnings */
+    .alert-box {
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+    .alert-warning {
+      background-color: #fefce8;
+      border: 1px solid #fde047;
+      color: #854d0e;
+    }
+    .alert-danger {
+      background-color: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+    }
+
+    /* style16: Edit modal overlay and dialog container */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .modal-box {
+      background: #ffffff;
+      width: 420px;
+      max-width: 90%;
+      border-radius: 8px;
+      padding: 20px;
+      border: 1px solid #cbd5e1;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- html1: Main system title header -->
+  <div class="main-header">
+    <h1>Canteen Management System</h1>
+  </div>
+
+  <!-- html2: Side-by-side dashboard layout container -->
+  <div class="dashboard-grid">
+
+    <!-- html3: Admin management column -->
+    <div>
+      <div class="section-title admin-title">Admin</div>
+
+      <!-- html4: Add new product form card -->
+      <div class="card">
+        <div class="card-title">Add New Product</div>
+
+        <div class="form-group">
+          <label>Product Name</label>
+          <input type="text" id="addName" placeholder="e.g., Chicken Adobo">
+        </div>
+
+        <div class="form-group">
+          <label>Category</label>
+          <select id="addCategory" onchange="handleAddCategoryChange()">
+            <option value="Rice Meals">Rice Meals</option>
+            <option value="Beverages">Beverages</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Price (₱)</label>
+          <input type="number" id="addPrice" step="0.5" placeholder="0.00" value="0.00">
+        </div>
+
+        <div class="form-group">
+          <label id="addStockLabel">Initial Stock Quantity</label>
+          <div class="split-row">
+            <input type="number" id="addStock" placeholder="0" value="0" style="flex: 2;">
+            <select id="addUnit" style="flex: 1.2;">
+              <!-- Populated via JS -->
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Expiry Date</label>
+          <input type="date" id="addExpiry">
+        </div>
+
+        <button class="btn btn-primary" onclick="addProduct()">Add to Inventory</button>
+      </div>
+
+      <!-- html5: Admin inventory table card -->
+      <div class="card">
+        <div class="card-title">Inventory</div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock Left</th>
+                <th>Expiry</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="inventoryTableBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- html6: Customer ordering column -->
+    <div>
+      <div class="section-title customer-title">Customer</div>
+
+      <!-- html7: Customer warning alerts container for low stock and expiry -->
+      <div id="customerAlertContainer"></div>
+
+      <!-- html8: Customer available menu items card -->
+      <div class="card">
+        <div class="card-title">Available Menu</div>
+        <div class="card-subtitle">Items appear here automatically when added by Admin and are in stock.</div>
+        <div id="availableMenuList" class="menu-item-list">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+      <!-- html9: Customer current order tray and checkout card -->
+      <div class="card">
+        <div class="card-title">Your Current Order</div>
+        <div id="orderContainer">
+          <!-- Order table or empty text rendered via JS -->
+        </div>
+
+        <div class="form-group" style="margin-top: 10px;">
+          <label>Customer Name</label>
+          <input type="text" id="customerNameInput" placeholder="Enter customer name (optional, defaults to Customer)">
+        </div>
+
+        <div class="order-total-row">
+          <span>Total Amount:</span>
+          <span class="order-total-val" id="orderTotalDisplay">₱0.00</span>
+        </div>
+
+        <button class="btn btn-success" id="checkoutBtn" onclick="placeOrder()" disabled>Place Order & Deduct Stock</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- html10: Full-width daily transactions and purchase history card -->
+  <div class="card" style="margin-top: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+      <div>
+        <div class="card-title" style="margin-bottom: 2px;">Daily Transactions & Purchase History</div>
+        <div class="card-subtitle" style="margin-bottom: 0;">Log of completed customer purchases and daily sales.</div>
+      </div>
+      <div style="font-size: 14px; font-weight: 700; color: #16a34a;">
+        Total Daily Revenue: <span id="totalRevenueDisplay">₱0.00</span>
+      </div>
+    </div>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Order #</th>
+            <th>Customer</th>
+            <th>Items Purchased</th>
+            <th>Total Amount</th>
+            <th>Date & Time</th>
+          </tr>
+        </thead>
+        <tbody id="transactionTableBody">
+          <!-- Rendered via JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- html11: Edit product modal popup dialog -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <span>Edit Product</span>
+        <button class="modal-close" onclick="closeEditModal()">x</button>
+      </div>
+
+      <div class="form-group">
+        <label>Product Name</label>
+        <input type="text" id="editName">
+      </div>
+
+      <div class="form-group">
+        <label>Category</label>
+        <select id="editCategory" onchange="handleEditCategoryChange()">
+          <option value="Rice Meals">Rice Meals</option>
+          <option value="Beverages">Beverages</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Price (₱)</label>
+        <input type="number" id="editPrice" step="0.5">
+      </div>
+
+      <div class="form-group">
+        <label id="editStockLabel">Stock Quantity</label>
+        <div class="split-row">
+          <input type="number" id="editStock" style="flex: 2;">
+          <select id="editUnit" style="flex: 1.2;">
+            <!-- Populated via JS -->
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Expiry Date</label>
+        <input type="date" id="editExpiry">
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-edit" onclick="closeEditModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveEditedProduct()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // js1: Category and unit mapping configuration
+    const CATEGORY_UNITS = {
+      "Rice Meals": ["servings", "plates", "bowls", "pcs"],
+      "Beverages": ["bottles", "cans", "cups", "packs"]
+    };
+
+    // js2: Initial default inventory dataset
+    const DEFAULT_INVENTORY = [
+      { id: 1, name: "Chicken Adobo Rice", category: "Rice Meals", price: 65, stock: 20, unit: "servings", expiry: "2026-10-25" },
+      { id: 2, name: "Bottled Mineral Water", category: "Beverages", price: 15, stock: 45, unit: "bottles", expiry: "2026-12-31" },
+      { id: 3, name: "Iced Tea", category: "Beverages", price: 20, stock: 25, unit: "cups", expiry: "2026-10-28" }
+    ];
+
+    // js3: LocalStorage loader for inventory items
+    let inventory = JSON.parse(localStorage.getItem("canteen_inventory") || "null");
+    if (!inventory || !Array.isArray(inventory)) {
+      inventory = DEFAULT_INVENTORY;
+      saveInventory();
+    }
+
+    // js4: LocalStorage loader for purchase transactions history
+    let transactions = JSON.parse(localStorage.getItem("canteen_transactions") || "[]");
+
+    // js5: Global state tracking variables
+    let currentOrder = [];
+    let activeEditingId = null;
+
+    // js6: Function to save current inventory state into LocalStorage
+    function saveInventory() {
+      localStorage.setItem("canteen_inventory", JSON.stringify(inventory));
+    }
+
+    // js7: Function to populate unit dropdown options dynamically
+    function populateUnits(selectElement, category, selectedValue = "") {
+      const units = CATEGORY_UNITS[category] || CATEGORY_UNITS["Rice Meals"];
+      selectElement.innerHTML = "";
+      units.forEach(u => {
+        const opt = document.createElement("option");
+        opt.value = u;
+        opt.textContent = u;
+        if (selectedValue && u.toLowerCase() === selectedValue.toLowerCase()) {
+          opt.selected = true;
+        }
+        selectElement.appendChild(opt);
+      });
+      if (!selectElement.value && units.length > 0) {
+        selectElement.value = units[0];
+      }
+    }
+
+    // js8: Event handler for category selection change in Add Product form
+    function handleAddCategoryChange() {
+      const cat = document.getElementById("addCategory").value;
+      const unitSelect = document.getElementById("addUnit");
+      populateUnits(unitSelect, cat);
+    }
+
+    // js9: Event handler for category selection change in Edit Product modal
+    function handleEditCategoryChange(presetUnit = "") {
+      const cat = document.getElementById("editCategory").value;
+      const unitSelect = document.getElementById("editUnit");
+      populateUnits(unitSelect, cat, presetUnit);
+    }
+
+    // js10: Master render function to refresh all UI tables and lists
+    function renderAll() {
+      renderInventoryTable();
+      renderAvailableMenu();
+      renderCurrentOrder();
+      renderTransactions();
+    }
+
+    // js11: Function to render the Admin inventory table with status indicators
+    function renderInventoryTable() {
+      const tbody = document.getElementById("inventoryTableBody");
+      tbody.innerHTML = "";
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const threeDaysAhead = new Date();
+      threeDaysAhead.setDate(today.getDate() + 3);
+      threeDaysAhead.setHours(23, 59, 59, 999);
+
+      if (inventory.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-note" style="text-align:center;">No inventory items found.</td></tr>';
+        return;
+      }
+
+      inventory.forEach(item => {
+        const expiryDate = new Date(item.expiry);
+        expiryDate.setHours(0, 0, 0, 0);
+
+        const isExpired = expiryDate <= today;
+        const isNearExpiry = !isExpired && expiryDate <= threeDaysAhead;
+        const isOut = item.stock <= 0;
+        const isLow = item.stock > 0 && item.stock <= 20;
+
+        let statusBadge = '<span class="badge badge-good">Good</span>';
+        if (isExpired) {
+          statusBadge = '<span class="badge badge-expired">Expired</span>';
+        } else if (isOut) {
+          statusBadge = '<span class="badge badge-out">Out of Stock</span>';
+        } else if (isNearExpiry) {
+          statusBadge = '<span class="badge badge-expired">Near Expiry</span>';
+        } else if (isLow) {
+          statusBadge = '<span class="badge badge-low">Low Stock</span>';
+        }
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${item.name}</strong></td>
+          <td>${item.category}</td>
+          <td>₱${Number(item.price).toFixed(2)}</td>
+          <td>${item.stock} ${item.unit}</td>
+          <td>${item.expiry}</td>
+          <td>${statusBadge}</td>
+          <td>
+            <button class="btn btn-sm btn-edit" onclick="openEditModal(${item.id})">Edit</button>
+            <button class="btn btn-sm btn-delete" onclick="deleteProduct(${item.id})">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // js12: Function to render Customer available menu with low stock and expiry notices
+    function renderAvailableMenu() {
+      const menuList = document.getElementById("availableMenuList");
+      const alertContainer = document.getElementById("customerAlertContainer");
+      menuList.innerHTML = "";
+      if (alertContainer) alertContainer.innerHTML = "";
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const threeDaysAhead = new Date();
+      threeDaysAhead.setDate(today.getDate() + 3);
+      threeDaysAhead.setHours(23, 59, 59, 999);
+
+      let lowStockAlerts = [];
+      let nearExpiryAlerts = [];
+      const availableItems = [];
+
+      inventory.forEach(item => {
+        const expiryDate = new Date(item.expiry);
+        expiryDate.setHours(0, 0, 0, 0);
+
+        const isExpired = expiryDate <= today;
+        const isNearExpiry = !isExpired && expiryDate <= threeDaysAhead;
+        const isLowStock = item.stock > 0 && item.stock <= 20;
+
+        if (item.stock > 0 && isLowStock) {
+          lowStockAlerts.push(`${item.name} (${item.stock} ${item.unit} left)`);
+        }
+        if (item.stock > 0 && isNearExpiry) {
+          nearExpiryAlerts.push(`${item.name} (expires ${item.expiry})`);
+        }
+
+        if (item.stock > 0 && !isExpired) {
+          availableItems.push({
+            ...item,
+            isLowStock,
+            isNearExpiry
+          });
+        }
+      });
+
+      if (alertContainer) {
+        if (lowStockAlerts.length > 0) {
+          const warnBox = document.createElement("div");
+          warnBox.className = "alert-box alert-warning";
+          warnBox.innerHTML = `<strong>Low Stock Warning:</strong> The following food items are running low (20 or fewer remaining): ${lowStockAlerts.join(", ")}.`;
+          alertContainer.appendChild(warnBox);
+        }
+        if (nearExpiryAlerts.length > 0) {
+          const expBox = document.createElement("div");
+          expBox.className = "alert-box alert-danger";
+          expBox.innerHTML = `<strong>Expiry Notice:</strong> The following items are nearing their expiry date: ${nearExpiryAlerts.join(", ")}.`;
+          alertContainer.appendChild(expBox);
+        }
+      }
+
+      if (availableItems.length === 0) {
+        menuList.innerHTML = '<div class="empty-note">No items currently available.</div>';
+        return;
+      }
+
+      availableItems.forEach(item => {
+        let tagHtml = "";
+        if (item.isLowStock) {
+          tagHtml += ` <span class="badge badge-low">Low Stock</span>`;
+        }
+        if (item.isNearExpiry) {
+          tagHtml += ` <span class="badge badge-expired">Near Expiry</span>`;
+        }
+
+        const div = document.createElement("div");
+        div.className = "menu-item-row";
+        div.innerHTML = `
+          <div class="menu-item-details">
+            <span class="menu-item-name">${item.name}${tagHtml}</span>
+            <span class="menu-item-sub">${item.category} &bull; Stock left: <strong>${item.stock} ${item.unit}</strong> &bull; Exp: ${item.expiry}</span>
+          </div>
+          <div class="menu-item-right">
+            <span class="menu-item-price">₱${Number(item.price).toFixed(2)}</span>
+            <button class="btn btn-add-item" onclick="addToOrder(${item.id})">+ Add</button>
+          </div>
+        `;
+        menuList.appendChild(div);
+      });
+    }
+
+    // js13: Function to add a selected menu item to the customer order tray
+    function addToOrder(id) {
+      const product = inventory.find(i => i.id === id);
+      if (!product || product.stock <= 0) {
+        alert("This item is currently out of stock.");
+        return;
+      }
+
+      const existing = currentOrder.find(item => item.id === id);
+      if (existing) {
+        if (existing.qty < product.stock) {
+          existing.qty += 1;
+        } else {
+          alert(`Cannot add more. Maximum available stock is ${product.stock}.`);
+          return;
+        }
+      } else {
+        currentOrder.push({
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          unit: product.unit,
+          qty: 1
+        });
+      }
+
+      renderCurrentOrder();
+    }
+
+    // js14: Function to increment or decrement ordered item quantity
+    function updateOrderQty(id, delta) {
+      const orderItem = currentOrder.find(i => i.id === id);
+      const product = inventory.find(i => i.id === id);
+      if (!orderItem) return;
+
+      if (delta > 0) {
+        if (product && orderItem.qty >= product.stock) {
+          alert(`Cannot add more. Maximum available stock is ${product.stock}.`);
+          return;
+        }
+        orderItem.qty += 1;
+      } else {
+        orderItem.qty -= 1;
+        if (orderItem.qty <= 0) {
+          currentOrder = currentOrder.filter(i => i.id !== id);
+        }
+      }
+
+      renderCurrentOrder();
+    }
+
+    // js15: Function to remove an item entirely from the customer order tray
+    function removeOrderItem(id) {
+      currentOrder = currentOrder.filter(i => i.id !== id);
+      renderCurrentOrder();
+    }
+
+    // js16: Function to render the customer current order tray table and total
+    function renderCurrentOrder() {
+      const container = document.getElementById("orderContainer");
+      const totalDisplay = document.getElementById("orderTotalDisplay");
+      const checkoutBtn = document.getElementById("checkoutBtn");
+
+      if (currentOrder.length === 0) {
+        container.innerHTML = '<div class="empty-note">Your order is currently empty. Click "+ Add" on items above.</div>';
+        totalDisplay.textContent = "₱0.00";
+        checkoutBtn.disabled = true;
+        return;
+      }
+
+      let total = 0;
+      let html = `
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Price</th>
+              <th style="text-align: center;">Qty</th>
+              <th style="text-align: right;">Subtotal</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      currentOrder.forEach(item => {
+        const subtotal = item.price * item.qty;
+        total += subtotal;
+        html += `
+          <tr>
+            <td><strong>${item.name}</strong></td>
+            <td>₱${Number(item.price).toFixed(2)}</td>
+            <td style="text-align: center;">
+              <button class="btn-qty" onclick="updateOrderQty(${item.id}, -1)">-</button>
+              <span style="display: inline-block; min-width: 24px; text-align: center;">${item.qty}</span>
+              <button class="btn-qty" onclick="updateOrderQty(${item.id}, 1)">+</button>
+            </td>
+            <td style="text-align: right;">₱${subtotal.toFixed(2)}</td>
+            <td style="text-align: right;">
+              <button class="btn btn-sm btn-delete" onclick="removeOrderItem(${item.id})">Remove</button>
+            </td>
+          </tr>
+        `;
+      });
+
+      html += `</tbody></table>`;
+      container.innerHTML = html;
+      totalDisplay.textContent = `₱${total.toFixed(2)}`;
+      checkoutBtn.disabled = false;
+    }
+
+    // js17: Function to place order, deduct inventory stock, and log daily transaction
+    function placeOrder() {
+      if (currentOrder.length === 0) return;
+
+      for (const orderItem of currentOrder) {
+        const prod = inventory.find(p => p.id === orderItem.id);
+        if (!prod || prod.stock < orderItem.qty) {
+          alert(`Sorry, "${orderItem.name}" does not have enough stock.`);
+          return;
+        }
+      }
+
+      const custInput = document.getElementById("customerNameInput");
+      const customerName = (custInput && custInput.value.trim()) ? custInput.value.trim() : "Walk-in Customer";
+      const orderNumber = Math.floor(1000 + Math.random() * 9000);
+
+      let totalAmount = 0;
+      const purchasedSummary = [];
+
+      currentOrder.forEach(orderItem => {
+        const prod = inventory.find(p => p.id === orderItem.id);
+        if (prod) {
+          prod.stock -= orderItem.qty;
+          totalAmount += orderItem.price * orderItem.qty;
+          purchasedSummary.push(`${orderItem.name} x${orderItem.qty}`);
+        }
+      });
+
+      const newTransaction = {
+        orderNumber: orderNumber,
+        customerName: customerName,
+        items: purchasedSummary.join(", "),
+        total: totalAmount,
+        timestamp: new Date().toLocaleString([], { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+      };
+
+      transactions.unshift(newTransaction);
+      localStorage.setItem("canteen_transactions", JSON.stringify(transactions));
+      saveInventory();
+
+      alert(`Order Confirmed!\nOrder #${orderNumber} for ${customerName}\nTotal Amount Deducted: ₱${totalAmount.toFixed(2)}\n\nStock has been deducted and transaction logged.`);
+
+      if (custInput) custInput.value = "";
+      currentOrder = [];
+      renderAll();
+    }
+
+    // js18: Function to render daily transactions history table and total sales revenue
+    function renderTransactions() {
+      const tbody = document.getElementById("transactionTableBody");
+      const totalRev = document.getElementById("totalRevenueDisplay");
+      if (!tbody || !totalRev) return;
+
+      tbody.innerHTML = "";
+      let totalSales = 0;
+
+      if (transactions.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-note" style="text-align:center;">No purchases logged yet today.</td></tr>';
+        totalRev.textContent = "₱0.00";
+        return;
+      }
+
+      transactions.forEach(tx => {
+        totalSales += Number(tx.total);
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>#${tx.orderNumber}</strong></td>
+          <td>${tx.customerName}</td>
+          <td>${tx.items}</td>
+          <td style="font-weight: 700; color: #16a34a;">₱${Number(tx.total).toFixed(2)}</td>
+          <td style="color: #64748b; font-size: 11px;">${tx.timestamp}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      totalRev.textContent = `₱${totalSales.toFixed(2)}`;
+    }
+
+    // js19: Function to add a new product into inventory from the Admin form
+    function addProduct() {
+      const name = document.getElementById("addName").value.trim();
+      const category = document.getElementById("addCategory").value;
+      const price = parseFloat(document.getElementById("addPrice").value) || 0;
+      const stock = parseInt(document.getElementById("addStock").value) || 0;
+      const unit = document.getElementById("addUnit").value;
+      const expiry = document.getElementById("addExpiry").value;
+
+      if (!name) {
+        alert("Please enter a Product Name.");
+        return;
+      }
+      if (!expiry) {
+        alert("Please select an Expiry Date.");
+        return;
+      }
+
+      const newItem = {
+        id: Date.now(),
+        name,
+        category,
+        price,
+        stock,
+        unit,
+        expiry
+      };
+
+      inventory.unshift(newItem);
+      saveInventory();
+
+      document.getElementById("addName").value = "";
+      document.getElementById("addPrice").value = "0.00";
+      document.getElementById("addStock").value = "0";
+      document.getElementById("addExpiry").value = "";
+
+      renderAll();
+      alert(`"${name}" has been added to inventory.`);
+    }
+
+    // js20: Function to delete a product from inventory
+    function deleteProduct(id) {
+      const prod = inventory.find(p => p.id === id);
+      const name = prod ? prod.name : "this item";
+      if (confirm(`Are you sure you want to delete "${name}"?`)) {
+        inventory = inventory.filter(p => p.id !== id);
+        currentOrder = currentOrder.filter(o => o.id !== id);
+        saveInventory();
+        renderAll();
+      }
+    }
+
+    // js21: Function to open edit modal pre-populated with selected product data
+    function openEditModal(id) {
+      const prod = inventory.find(p => p.id === id);
+      if (!prod) return;
+
+      activeEditingId = id;
+      document.getElementById("editName").value = prod.name;
+      document.getElementById("editCategory").value = prod.category;
+      document.getElementById("editPrice").value = prod.price;
+      document.getElementById("editStock").value = prod.stock;
+      document.getElementById("editExpiry").value = prod.expiry;
+
+      handleEditCategoryChange(prod.unit);
+
+      document.getElementById("editModal").style.display = "flex";
+    }
+
+    // js22: Function to close the edit product modal dialog
+    function closeEditModal() {
+      document.getElementById("editModal").style.display = "none";
+      activeEditingId = null;
+    }
+
+    // js23: Function to save edited product changes into inventory
+    function saveEditedProduct() {
+      if (!activeEditingId) return;
+
+      const prod = inventory.find(p => p.id === activeEditingId);
+      if (!prod) return;
+
+      const name = document.getElementById("editName").value.trim();
+      const category = document.getElementById("editCategory").value;
+      const price = parseFloat(document.getElementById("editPrice").value) || 0;
+      const stock = parseInt(document.getElementById("editStock").value) || 0;
+      const unit = document.getElementById("editUnit").value;
+      const expiry = document.getElementById("editExpiry").value;
+
+      if (!name || !expiry) {
+        alert("Please complete Product Name and Expiry Date.");
+        return;
+      }
+
+      prod.name = name;
+      prod.category = category;
+      prod.price = price;
+      prod.stock = stock;
+      prod.unit = unit;
+      prod.expiry = expiry;
+
+      saveInventory();
+      closeEditModal();
+      renderAll();
+    }
+
+    // js24: Event listener to initialize application when page finishes loading
+    document.addEventListener("DOMContentLoaded", () => {
+      handleAddCategoryChange();
+      renderAll();
+    });
+  </script>
+</body>
+</html>
