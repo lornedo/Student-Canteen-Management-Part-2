@@ -407,6 +407,9 @@
     <div>
       <div class="section-title admin-title">Admin</div>
 
+      <!-- Admin inventory warnings -->
+      <div id="adminAlertContainer"></div>
+
       <!-- html4: Add new product form card -->
       <div class="card">
         <div class="card-title">Add New Product</div>
@@ -483,9 +486,6 @@
     <!-- html6: Customer ordering column -->
     <div>
       <div class="section-title customer-title">Customer</div>
-
-      <!-- html7: Customer warning alerts container for low stock and expiry -->
-      <div id="customerAlertContainer"></div>
 
       <!-- html8: Customer available menu items card -->
       <div class="card">
@@ -760,10 +760,10 @@
       });
     }
 
-    // js12: Function to render Customer available menu with low stock and expiry notices
+    // js12: Function to render Customer menu and Admin low-stock/expiry notices
     function renderAvailableMenu() {
       const menuList = document.getElementById("availableMenuList");
-      const alertContainer = document.getElementById("customerAlertContainer");
+      const alertContainer = document.getElementById("adminAlertContainer");
       menuList.innerHTML = "";
       if (alertContainer) alertContainer.innerHTML = "";
 
