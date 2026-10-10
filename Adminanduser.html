@@ -984,6 +984,8 @@
 
       const custInput = document.getElementById("customerNameInput");
       const customerName = (custInput && custInput.value.trim()) ? custInput.value.trim() : "Walk-in Customer";
+      const orderTotal = currentOrder.reduce((total, orderItem) => total + orderItem.price * orderItem.qty, 0);
+      if (!confirm(`Are you sure you want to place this order for ${customerName}?\nTotal: ₱${orderTotal.toFixed(2)}`)) return;
       const orderNumber = Math.floor(1000 + Math.random() * 9000);
 
       let totalAmount = 0;
